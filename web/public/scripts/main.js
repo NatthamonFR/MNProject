@@ -17,10 +17,13 @@
 
 // Signs-in Friendly Chat.
 function signIn() {
-  // Sign in Firebase using popup auth and Google as the identity provider.
+  // Sign into Firebase using popup auth & Google as the identity provider.
   var provider = new firebase.auth.GoogleAuthProvider();
   firebase.auth().signInWithPopup(provider);
 }
+
+
+
 
 // Signs-out of Friendly Chat.
 function signOut() {
@@ -28,13 +31,17 @@ function signOut() {
   firebase.auth().signOut();
 }
 
-// Initiate firebase auth.
+
+
+// Initiate Firebase Auth.
 function initFirebaseAuth() {
   // Listen to auth state changes.
   firebase.auth().onAuthStateChanged(authStateObserver);
 }
 
-// Returns the signed-in user's profile Pic URL.
+
+
+// Returns the signed-in user's profile pic URL.
 function getProfilePicUrl() {
   return firebase.auth().currentUser.photoURL || '/images/profile_placeholder.png';
 }
@@ -44,10 +51,14 @@ function getUserName() {
   return firebase.auth().currentUser.displayName;
 }
 
+
 // Returns true if a user is signed-in.
 function isUserSignedIn() {
   return !!firebase.auth().currentUser;
 }
+
+
+
 
 // Saves a new message on the Cloud Firestore.
 function saveMessage(messageText) {
@@ -62,10 +73,14 @@ function saveMessage(messageText) {
   });
 }
 
+
 // Loads chat messages history and listens for upcoming ones.
 function loadMessages() {
   // Create the query to load the last 12 messages and listen for new ones.
-  var query = firebase.firestore().collection('messages').orderBy('timestamp', 'desc').limit(12);
+  var query = firebase.firestore()
+                  .collection('messages')
+                  .orderBy('timestamp', 'desc')
+                  .limit(12);
   
   // Start listening to the query.
   query.onSnapshot(function(snapshot) {
@@ -75,11 +90,12 @@ function loadMessages() {
       } else {
         var message = change.doc.data();
         displayMessage(change.doc.id, message.timestamp, message.name,
-                      message.text, message.profilePicUrl, message.imageUrl);
+                       message.text, message.profilePicUrl, message.imageUrl);
       }
     });
   });
 }
+
 
 // Saves a new message containing an image in Firebase.
 // This first saves the image in Firebase storage.
@@ -96,7 +112,7 @@ function saveImageMessage(file) {
     return firebase.storage().ref(filePath).put(file).then(function(fileSnapshot) {
       // 3 - Generate a public URL for the file.
       return fileSnapshot.ref.getDownloadURL().then((url) => {
-        // 4 - Update the chat message placeholder with the image’s URL.
+        // 4 - Update the chat message placeholder with the image's URL.
         return messageRef.update({
           imageUrl: url,
           storageUri: fileSnapshot.metadata.fullPath
@@ -107,6 +123,7 @@ function saveImageMessage(file) {
     console.error('There was an error uploading a file to Cloud Storage:', error);
   });
 }
+
 
 // Saves the messaging device token to the datastore.
 function saveMessagingDeviceToken() {
